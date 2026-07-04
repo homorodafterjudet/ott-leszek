@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <title>Ott leszek</title>
+  <style>
+    body {
+      font-family: Arial;
+      max-width: 500px;
+      margin: 40px auto;
+    }
+
+    input, button {
+      padding: 10px;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .list {
+      margin-top: 30px;
+    }
+
+    .item {
+      padding: 5px 0;
+      border-bottom: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Rendezvény</h1>
+
+  <label>
+    <input type="checkbox" id="check">
+    OTT LESZEK
+  </label>
+
+  <div id="form" style="display:none;">
+    <input type="text" id="name" placeholder="Írd be a neved">
+    <button onclick="send()">Küldés</button>
+  </div>
+
+  <div class="list">
+    <h3>Ott lesznek:</h3>
+    <div id="list"></div>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot } 
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // IDE fogod beilleszteni a Firebase configodat!!!
+    const firebaseConfig = {
+      apiKey: "IDE_JÖN",
+      authDomain: "IDE_JÖN",
+      projectId: "IDE_JÖN",
+      storageBucket: "IDE_JÖN",
+      messagingSenderId: "IDE_JÖN",
+      appId: "IDE_JÖN"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const check = document.getElementById("check");
+    const form = document.getElementById("form");
+
+    check.addEventListener("change", () => {
+      form.style.display = check.checked ? "block" : "none";
+    });
+
+    window.send = async function() {
+      const name = document.getElementById("name").value;
+
+      if (!name) return alert("Írj be nevet!");
+
+      await addDoc(collection(db, "people"), {
+        name: name
+      });
+
+      document.getElementById("name").value = "";
+    }
+
+    const listDiv = document.getElementById("list");
+
+    onSnapshot(collection(db, "people"), (snapshot) => {
+      listDiv.innerHTML = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        listDiv.innerHTML += `<div class="item">• ${data.name}</div>`;
+      });
+    });
+
+  </script>
+
+</body>
+</html>
