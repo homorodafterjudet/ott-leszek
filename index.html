@@ -7,49 +7,73 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #00c2c7;
-  color: white;
+body{
+  margin:0;
+  font-family: Arial;
+  background:#00c2c7;
+  color:white;
 }
 
-.container {
-  max-width: 600px;
-  margin: auto;
-  padding: 20px;
-  text-align: center;
+.container{
+  max-width:600px;
+  margin:auto;
+  padding:20px;
+  text-align:center;
 }
 
-h1 {
-  font-size: 32px;
+h1{font-size:32px;}
+h2{color:red;}
+
+/* 📱 MOBILBARÁT CHECKBOX */
+label{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  font-size:20px;
+  margin:20px 0;
+  cursor:pointer;
 }
 
-h2 {
-  color: red;
+input[type="checkbox"]{
+  transform:scale(1.8);
 }
 
-.list {
-  text-align: left;
-  margin-top: 20px;
+/* input + button */
+input{
+  width:100%;
+  padding:14px;
+  font-size:18px;
+  margin-top:10px;
 }
 
-.item {
-  padding: 5px 0;
-  font-size: 18px;
-  color: white;
+button{
+  width:100%;
+  padding:14px;
+  margin-top:10px;
+  font-size:18px;
+  background:black;
+  color:white;
+  border:none;
 }
 
-.footer {
-  margin-top: 30px;
-  font-size: 16px;
+/* lista */
+.list{
+  text-align:left;
+  margin-top:20px;
 }
 
-.info {
-  margin-top: 20px;
-  padding: 15px;
-  background: rgba(0,0,0,0.2);
-  border-radius: 10px;
+.item{
+  padding:6px 0;
+  font-size:18px;
+  color:white;
+}
+
+.info{
+  margin-top:25px;
+  padding:15px;
+  background:rgba(0,0,0,0.2);
+  border-radius:10px;
 }
 </style>
 </head>
@@ -61,18 +85,32 @@ h2 {
 <h1>ABSZOLVALO AFTER</h1>
 <h2>OTT LESZEK</h2>
 
+<!-- ✔️ MOBILBARÁT CHECKBOX -->
+<label>
+  <input type="checkbox" id="check">
+  OTT LESZEK
+</label>
+
+<!-- név input -->
+<div id="form" style="display:none;">
+  <input type="text" id="name" placeholder="Írd be a neved">
+  <button onclick="send()">Küldés</button>
+</div>
+
 <h3>Résztvevők:</h3>
 <div id="list"></div>
 
 <h3>Összesen: <span id="count">0</span> fő</h3>
 
+<!-- INFO ALUL -->
 <div class="info">
-  <p><b>Dátum:</b> 2026. július 8–9. (szerda–csütörtök)</p>
-  <p><b>Helyszín:</b> Casa Sofia, Băile Homorod 92B</p>
+  <p><b>Dátum:</b> 2026 07 8–9 (szerda–csütörtök)</p>
+  <p><b>Helyszín:</b> CASA SOFIA HOMOROD</p>
 </div>
 
 </div>
 
+<!-- FIREBASE -->
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -83,6 +121,7 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+/* 🔥 A TE FIREBASE KÓDOD */
 const firebaseConfig = {
   apiKey: "AIzaSyCYb6Lvht3pv0pThXjg8oiUXrL7HX03tcM",
   authDomain: "abszolvalo-after.firebaseapp.com",
@@ -95,10 +134,27 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+const check = document.getElementById("check");
+const form = document.getElementById("form");
+
+check.addEventListener("change", () => {
+  form.style.display = check.checked ? "block" : "none";
+});
+
+window.send = async function() {
+  const name = document.getElementById("name").value;
+
+  if (!name) return alert("Írj be nevet!");
+
+  await addDoc(collection(db, "people"), {
+    name: name
+  });
+
+  document.getElementById("name").value = "";
+};
+
 const list = document.getElementById("list");
 const count = document.getElementById("count");
-
-// ha nincs input még, akkor csak Firebase-ből olvassuk
 
 onSnapshot(collection(db, "people"), (snapshot) => {
   list.innerHTML = "";
@@ -109,9 +165,7 @@ onSnapshot(collection(db, "people"), (snapshot) => {
     const data = doc.data();
 
     list.innerHTML += `
-      <div class="item">
-        ${i}. ${data.name}
-      </div>
+      <div class="item">${i}. ${data.name}</div>
     `;
   });
 
