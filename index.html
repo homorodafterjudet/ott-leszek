@@ -6,163 +6,60 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-
 <style>
 body {
   margin: 0;
-  font-family: 'Orbitron', sans-serif;
+  font-family: Arial;
+  background: linear-gradient(135deg,#00c6ff,#0072ff,#00ffd5);
   color: white;
-  overflow-x: hidden;
-  background: linear-gradient(135deg, #00c6ff, #0072ff, #00ffd5);
-  background-size: 400% 400%;
-  animation: bgMove 10s ease infinite;
-}
-
-@keyframes bgMove {
-  0% {background-position: 0% 50%;}
-  50% {background-position: 100% 50%;}
-  100% {background-position: 0% 50%;}
 }
 
 .container {
-  max-width: 650px;
+  max-width: 600px;
   margin: auto;
   padding: 20px;
   text-align: center;
 }
 
-h1 { font-size: 32px; }
-h2 { color: red; }
-
-input {
+input, button {
   width: 100%;
-  padding: 15px;
+  padding: 12px;
   margin-top: 10px;
-  border-radius: 10px;
-  border: none;
-  font-size: 16px;
 }
 
 button {
-  width: 100%;
-  padding: 15px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: none;
   background: black;
   color: white;
-  font-size: 16px;
-}
-
-.confettiBtn {
-  background: gold;
-  color: black;
-  font-weight: bold;
-}
-
-.list {
-  margin-top: 20px;
-  text-align: left;
-}
-
-.item {
-  padding: 5px;
-  font-size: 18px;
+  border: none;
 }
 
 .red { color: red; }
 .white { color: white; }
-
-.emoji {
-  position: absolute;
-  font-size: 22px;
-  animation: float 8s linear infinite;
-  opacity: 0.6;
-}
-
-@keyframes float {
-  from { transform: translateY(100vh); }
-  to { transform: translateY(-10vh); }
-}
-
-.section {
-  margin-top: 30px;
-  padding: 15px;
-  background: rgba(0,0,0,0.3);
-  border-radius: 15px;
-}
 </style>
 </head>
 
 <body>
-
-<!-- EMOJIK -->
-<div class="emoji" style="left:10%;">🎉</div>
-<div class="emoji" style="left:30%; animation-delay:2s;">🔥</div>
-<div class="emoji" style="left:50%; animation-delay:4s;">🍾</div>
-<div class="emoji" style="left:70%; animation-delay:1s;">🎶</div>
 
 <div class="container">
 
 <h1>ABSZOLVALO AFTER</h1>
 <h2>OTT LESZEK</h2>
 
-<audio id="music" loop>
-  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
-</audio>
-
 <label>
-  <input type="checkbox" id="check"> JÖVÖK 🔥
+<input type="checkbox" id="check"> Jövök
 </label>
 
 <div id="form" style="display:none;">
-  <input type="text" id="name" placeholder="Írd be a neved">
+  <input type="text" id="name" placeholder="Név">
   <button onclick="send()">Küldés</button>
 </div>
 
-<button class="confettiBtn" onclick="confetti()">🎉 Confetti 🎉</button>
+<h3>Résztvevők:</h3>
+<div id="list"></div>
 
-<div class="list">
-  <h3>Ott lesznek:</h3>
-  <div id="list"></div>
-</div>
-
-<h3>Összesen: <span id="count">0</span> fő</h3>
-
-<!-- RÉSZLETEK -->
-<div class="section">
-  <h3>📅 RÉSZLETEK</h3>
-  <p>2026. július 8–9. (szerda–csütörtök)</p>
-</div>
-
-<!-- MAP + LINK -->
-<div class="section">
-  <h3>📍 HELYSZÍN</h3>
-
-  <a href="https://www.google.com/maps/search/Casa+Sofia+Băile+Homorod+92B+535801"
-     target="_blank"
-     style="display:inline-block; padding:10px; background:#00ffd5; color:black; border-radius:10px; text-decoration:none;">
-     📍 Open in Google Maps
-  </a>
-
-  <br><br>
-
-  <iframe
-    src="https://www.google.com/maps?q=Casa%20Sofia%20Băile%20Homorod%2092B%20535801&output=embed"
-    width="100%" height="200" style="border:0; border-radius:12px;">
-  </iframe>
-</div>
-
-<!-- COUNTDOWN -->
-<div class="section">
-  <h3>⏳ VISSZASZÁMLÁLÁS</h3>
-  <div id="countdown"></div>
-</div>
+<h3>Összesen: <span id="count">0</span></h3>
 
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script type="module">
 
@@ -182,16 +79,15 @@ const firebaseConfig = {
   messagingSenderId: "947590019241",
   appId: "1:947590019241:web:f55c24e514ab5d2e8791b8"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const check = document.getElementById("check");
 const form = document.getElementById("form");
-const music = document.getElementById("music");
 
 check.addEventListener("change", () => {
   form.style.display = check.checked ? "block" : "none";
-  music.play().catch(()=>{});
 });
 
 window.send = async function() {
@@ -202,48 +98,23 @@ window.send = async function() {
   document.getElementById("name").value = "";
 };
 
-window.confetti = function() {
-  confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-};
-
-const listDiv = document.getElementById("list");
+const list = document.getElementById("list");
 const count = document.getElementById("count");
 
-onSnapshot(collection(db, "people"), (snapshot) => {
-  listDiv.innerHTML = "";
+onSnapshot(collection(db, "people"), (snap) => {
+
+  list.innerHTML = "";
   let i = 0;
 
-  snapshot.forEach(doc => {
+  snap.forEach(doc => {
     i++;
     const data = doc.data();
-    const color = i % 2 === 0 ? "red" : "white";
 
-    listDiv.innerHTML += `<div class="item ${color}">${i}. ${data.name}</div>`;
+    list.innerHTML += `<div class="${i%2===0?'red':'white'}">${i}. ${data.name}</div>`;
   });
 
   count.innerText = i;
 });
-
-// countdown
-const countdownEl = document.getElementById("countdown");
-const eventDate = new Date("2026-07-08T18:00:00").getTime();
-
-setInterval(() => {
-  const now = new Date().getTime();
-  const diff = eventDate - now;
-
-  if (diff <= 0) {
-    countdownEl.innerHTML = "🔥 ELKEZDŐDÖTT!";
-    return;
-  }
-
-  const d = Math.floor(diff / (1000*60*60*24));
-  const h = Math.floor((diff%(1000*60*60*24))/(1000*60*60));
-  const m = Math.floor((diff%(1000*60*60))/(1000*60));
-  const s = Math.floor((diff%(1000*60))/1000);
-
-  countdownEl.innerHTML = `${d} nap ${h} óra ${m} perc ${s} mp`;
-}, 1000);
 
 </script>
 
