@@ -21,35 +21,26 @@ body{
   text-align:center;
 }
 
-h1{font-size:32px;}
+h1{font-size:30px;}
 h2{color:red;}
 
-/* 📱 MOBILBARÁT CHECKBOX */
-label{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
-  font-size:20px;
+/* egyszerű checkbox */
+.box{
   margin:20px 0;
-  cursor:pointer;
+  font-size:22px;
 }
 
-input[type="checkbox"]{
-  transform:scale(1.8);
-}
-
-/* input + button */
+/* input + gomb */
 input{
   width:100%;
-  padding:14px;
+  padding:12px;
   font-size:18px;
   margin-top:10px;
 }
 
 button{
   width:100%;
-  padding:14px;
+  padding:12px;
   margin-top:10px;
   font-size:18px;
   background:black;
@@ -64,16 +55,14 @@ button{
 }
 
 .item{
-  padding:6px 0;
+  padding:5px 0;
   font-size:18px;
-  color:white;
 }
 
 .info{
   margin-top:25px;
   padding:15px;
   background:rgba(0,0,0,0.2);
-  border-radius:10px;
 }
 </style>
 </head>
@@ -85,13 +74,12 @@ button{
 <h1>ABSZOLVALO AFTER</h1>
 <h2>OTT LESZEK</h2>
 
-<!-- ✔️ MOBILBARÁT CHECKBOX -->
-<label>
+<!-- EGYSZERŰ CHECKBOX (NINCS CSS TRÜKK) -->
+<div class="box">
   <input type="checkbox" id="check">
-  OTT LESZEK
-</label>
+  <label for="check">OTT LESZEK</label>
+</div>
 
-<!-- név input -->
 <div id="form" style="display:none;">
   <input type="text" id="name" placeholder="Írd be a neved">
   <button onclick="send()">Küldés</button>
@@ -102,7 +90,6 @@ button{
 
 <h3>Összesen: <span id="count">0</span> fő</h3>
 
-<!-- INFO ALUL -->
 <div class="info">
   <p><b>Dátum:</b> 2026 07 8–9 (szerda–csütörtök)</p>
   <p><b>Helyszín:</b> CASA SOFIA HOMOROD</p>
@@ -110,7 +97,6 @@ button{
 
 </div>
 
-<!-- FIREBASE -->
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -121,7 +107,6 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* 🔥 A TE FIREBASE KÓDOD */
 const firebaseConfig = {
   apiKey: "AIzaSyCYb6Lvht3pv0pThXjg8oiUXrL7HX03tcM",
   authDomain: "abszolvalo-after.firebaseapp.com",
@@ -138,7 +123,11 @@ const check = document.getElementById("check");
 const form = document.getElementById("form");
 
 check.addEventListener("change", () => {
-  form.style.display = check.checked ? "block" : "none";
+  if (check.checked) {
+    form.style.display = "block";
+  } else {
+    form.style.display = "none";
+  }
 });
 
 window.send = async function() {
@@ -146,9 +135,7 @@ window.send = async function() {
 
   if (!name) return alert("Írj be nevet!");
 
-  await addDoc(collection(db, "people"), {
-    name: name
-  });
+  await addDoc(collection(db, "people"), { name });
 
   document.getElementById("name").value = "";
 };
@@ -156,17 +143,13 @@ window.send = async function() {
 const list = document.getElementById("list");
 const count = document.getElementById("count");
 
-onSnapshot(collection(db, "people"), (snapshot) => {
+onSnapshot(collection(db, "people"), (snap) => {
   list.innerHTML = "";
   let i = 0;
 
-  snapshot.forEach(doc => {
+  snap.forEach(doc => {
     i++;
-    const data = doc.data();
-
-    list.innerHTML += `
-      <div class="item">${i}. ${data.name}</div>
-    `;
+    list.innerHTML += `<div class="item">${i}. ${doc.data().name}</div>`;
   });
 
   count.innerText = i;
