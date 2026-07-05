@@ -4,126 +4,72 @@
 <meta charset="UTF-8">
 <title>ABSZOLVALO AFTER</title>
 
-<!-- FONT -->
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
   margin: 0;
-  font-family: 'Orbitron', sans-serif;
+  font-family: Arial, sans-serif;
+  background: #00c2c7;
   color: white;
-  overflow-x: hidden;
-
-  /* többszínű háttér */
-  background: linear-gradient(135deg, #00c6ff, #0072ff, #00ffd5);
-  background-size: 400% 400%;
-  animation: bgMove 10s ease infinite;
-}
-
-@keyframes bgMove {
-  0% {background-position: 0% 50%;}
-  50% {background-position: 100% 50%;}
-  100% {background-position: 0% 50%;}
-}
-
-/* lebegő emojik */
-.emoji {
-  position: absolute;
-  font-size: 24px;
-  animation: float 8s linear infinite;
-  opacity: 0.6;
-}
-
-@keyframes float {
-  from { transform: translateY(100vh); }
-  to { transform: translateY(-10vh); }
 }
 
 .container {
-  max-width: 500px;
+  max-width: 600px;
   margin: auto;
+  padding: 20px;
   text-align: center;
-  padding-top: 40px;
 }
 
 h1 {
-  font-size: 34px;
-  letter-spacing: 2px;
+  font-size: 32px;
 }
 
 h2 {
   color: red;
 }
 
-input, button {
-  padding: 10px;
-  width: 90%;
-  margin-top: 10px;
-  border: none;
-  border-radius: 8px;
-}
-
-button {
-  background: black;
-  color: white;
-  cursor: pointer;
-}
-
 .list {
-  margin-top: 30px;
   text-align: left;
+  margin-top: 20px;
 }
 
 .item {
-  padding: 5px;
+  padding: 5px 0;
   font-size: 18px;
-}
-
-.red {
-  color: red;
-}
-
-.white {
   color: white;
 }
 
-footer {
+.footer {
+  margin-top: 30px;
+  font-size: 16px;
+}
+
+.info {
   margin-top: 20px;
-  font-size: 18px;
+  padding: 15px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- EMOJIK -->
-<div class="emoji" style="left:10%;">🎉</div>
-<div class="emoji" style="left:30%; animation-delay:2s;">🔥</div>
-<div class="emoji" style="left:50%; animation-delay:4s;">🍾</div>
-<div class="emoji" style="left:70%; animation-delay:1s;">🎶</div>
-<div class="emoji" style="left:90%; animation-delay:3s;">💃</div>
-
 <div class="container">
 
 <h1>ABSZOLVALO AFTER</h1>
-
 <h2>OTT LESZEK</h2>
 
-<input type="checkbox" id="check"> Pipáld be ha jössz
+<h3>Résztvevők:</h3>
+<div id="list"></div>
 
-<div id="form" style="display:none;">
-  <input type="text" id="name" placeholder="Írd be a neved">
-  <button onclick="send()">Küldés</button>
+<h3>Összesen: <span id="count">0</span> fő</h3>
+
+<div class="info">
+  <p><b>Dátum:</b> 2026. július 8–9. (szerda–csütörtök)</p>
+  <p><b>Helyszín:</b> Casa Sofia, Băile Homorod 92B</p>
 </div>
-
-<div class="list">
-  <h3>Ott lesznek:</h3>
-  <div id="list"></div>
-</div>
-
-<footer>
-Összesen: <span id="count">0</span> fő
-</footer>
 
 </div>
 
@@ -149,41 +95,21 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const check = document.getElementById("check");
-const form = document.getElementById("form");
-
-check.addEventListener("change", () => {
-  form.style.display = check.checked ? "block" : "none";
-});
-
-window.send = async function() {
-  const name = document.getElementById("name").value;
-
-  if (!name) return alert("Írj be nevet!");
-
-  await addDoc(collection(db, "people"), {
-    name: name
-  });
-
-  document.getElementById("name").value = "";
-};
-
-const listDiv = document.getElementById("list");
+const list = document.getElementById("list");
 const count = document.getElementById("count");
 
-onSnapshot(collection(db, "people"), (snapshot) => {
+// ha nincs input még, akkor csak Firebase-ből olvassuk
 
-  listDiv.innerHTML = "";
+onSnapshot(collection(db, "people"), (snapshot) => {
+  list.innerHTML = "";
   let i = 0;
 
   snapshot.forEach(doc => {
-    const data = doc.data();
     i++;
+    const data = doc.data();
 
-    let colorClass = i % 2 === 0 ? "red" : "white";
-
-    listDiv.innerHTML += `
-      <div class="item ${colorClass}">
+    list.innerHTML += `
+      <div class="item">
         ${i}. ${data.name}
       </div>
     `;
