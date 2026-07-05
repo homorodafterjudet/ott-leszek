@@ -21,17 +21,31 @@ body{
   text-align:center;
 }
 
-h1{font-size:30px;}
-h2{color:red;}
+h1{
+  font-size:32px;
+}
 
-/* egyszerű checkbox */
-.box{
-  margin:20px 0;
+h2{
+  color:red;
+}
+
+/* ✔ CHECKBOX FIX */
+label{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
   font-size:22px;
+  margin:20px 0;
+  cursor:pointer;
+}
+
+input[type="checkbox"]{
+  transform: scale(1.5);
 }
 
 /* input + gomb */
-input{
+input[type="text"]{
   width:100%;
   padding:12px;
   font-size:18px;
@@ -46,6 +60,7 @@ button{
   background:black;
   color:white;
   border:none;
+  cursor:pointer;
 }
 
 /* lista */
@@ -59,10 +74,12 @@ button{
   font-size:18px;
 }
 
+/* info alul */
 .info{
   margin-top:25px;
   padding:15px;
   background:rgba(0,0,0,0.2);
+  border-radius:10px;
 }
 </style>
 </head>
@@ -74,12 +91,13 @@ button{
 <h1>ABSZOLVALO AFTER</h1>
 <h2>OTT LESZEK</h2>
 
-<!-- EGYSZERŰ CHECKBOX (NINCS CSS TRÜKK) -->
-<div class="box">
+<!-- ✔ CHECKBOX (EZ MOST MÁR LÁTSZIK!) -->
+<label>
   <input type="checkbox" id="check">
-  <label for="check">OTT LESZEK</label>
-</div>
+  <span>OTT LESZEK</span>
+</label>
 
+<!-- NÉV BEÍRÁS -->
 <div id="form" style="display:none;">
   <input type="text" id="name" placeholder="Írd be a neved">
   <button onclick="send()">Küldés</button>
@@ -90,6 +108,7 @@ button{
 
 <h3>Összesen: <span id="count">0</span> fő</h3>
 
+<!-- INFO -->
 <div class="info">
   <p><b>Dátum:</b> 2026 07 8–9 (szerda–csütörtök)</p>
   <p><b>Helyszín:</b> CASA SOFIA HOMOROD</p>
@@ -107,6 +126,7 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+/* 🔥 FIREBASE CONFIG (A TIÉD) */
 const firebaseConfig = {
   apiKey: "AIzaSyCYb6Lvht3pv0pThXjg8oiUXrL7HX03tcM",
   authDomain: "abszolvalo-after.firebaseapp.com",
@@ -122,6 +142,7 @@ const db = getFirestore(app);
 const check = document.getElementById("check");
 const form = document.getElementById("form");
 
+/* checkbox működés */
 check.addEventListener("change", () => {
   if (check.checked) {
     form.style.display = "block";
@@ -130,26 +151,34 @@ check.addEventListener("change", () => {
   }
 });
 
+/* küldés Firebase-be */
 window.send = async function() {
   const name = document.getElementById("name").value;
 
-  if (!name) return alert("Írj be nevet!");
+  if (!name) return alert("Írd be a neved!");
 
-  await addDoc(collection(db, "people"), { name });
+  await addDoc(collection(db, "people"), {
+    name: name
+  });
 
   document.getElementById("name").value = "";
 };
 
+/* lista */
 const list = document.getElementById("list");
 const count = document.getElementById("count");
 
-onSnapshot(collection(db, "people"), (snap) => {
+onSnapshot(collection(db, "people"), (snapshot) => {
   list.innerHTML = "";
   let i = 0;
 
-  snap.forEach(doc => {
+  snapshot.forEach(doc => {
     i++;
-    list.innerHTML += `<div class="item">${i}. ${doc.data().name}</div>`;
+    const data = doc.data();
+
+    list.innerHTML += `
+      <div class="item">${i}. ${data.name}</div>
+    `;
   });
 
   count.innerText = i;
