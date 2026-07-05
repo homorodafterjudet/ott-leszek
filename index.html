@@ -1,57 +1,180 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="UTF-8">
-  <title>Ott leszek</title>
-  <style>
-    body {
-      font-family: Arial;
-      max-width: 500px;
-      margin: 40px auto;
-    }
+<meta charset="UTF-8">
+<title>ABSZOLVALO AFTER</title>
 
-    input, button {
-      padding: 10px;
-      margin-top: 10px;
-      width: 100%;
-    }
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    .list {
-      margin-top: 30px;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
-    .item {
-      padding: 5px 0;
-      border-bottom: 1px solid #ddd;
-    }
-  </style>
+<style>
+body {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  color: white;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #00c6ff, #0072ff, #00ffd5);
+  background-size: 400% 400%;
+  animation: bgMove 10s ease infinite;
+}
+
+@keyframes bgMove {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
+}
+
+.container {
+  max-width: 650px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 { font-size: 32px; }
+h2 { color: red; }
+
+input {
+  width: 100%;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+  background: black;
+  color: white;
+  font-size: 16px;
+}
+
+.confettiBtn {
+  background: gold;
+  color: black;
+  font-weight: bold;
+}
+
+.list {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.item {
+  padding: 5px;
+  font-size: 18px;
+}
+
+.red { color: red; }
+.white { color: white; }
+
+.emoji {
+  position: absolute;
+  font-size: 22px;
+  animation: float 8s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes float {
+  from { transform: translateY(100vh); }
+  to { transform: translateY(-10vh); }
+}
+
+.section {
+  margin-top: 30px;
+  padding: 15px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 15px;
+}
+</style>
 </head>
+
 <body>
 
-  <h1>Rendezvény</h1>
+<!-- EMOJIK -->
+<div class="emoji" style="left:10%;">🎉</div>
+<div class="emoji" style="left:30%; animation-delay:2s;">🔥</div>
+<div class="emoji" style="left:50%; animation-delay:4s;">🍾</div>
+<div class="emoji" style="left:70%; animation-delay:1s;">🎶</div>
 
-  <label>
-    <input type="checkbox" id="check">
-    OTT LESZEK
-  </label>
+<div class="container">
 
-  <div id="form" style="display:none;">
-    <input type="text" id="name" placeholder="Írd be a neved">
-    <button onclick="send()">Küldés</button>
-  </div>
+<h1>ABSZOLVALO AFTER</h1>
+<h2>OTT LESZEK</h2>
 
-  <div class="list">
-    <h3>Ott lesznek:</h3>
-    <div id="list"></div>
-  </div>
+<audio id="music" loop>
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
+</audio>
 
-  <!-- Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot } 
-    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<label>
+  <input type="checkbox" id="check"> JÖVÖK 🔥
+</label>
 
-    const firebaseConfig = {
+<div id="form" style="display:none;">
+  <input type="text" id="name" placeholder="Írd be a neved">
+  <button onclick="send()">Küldés</button>
+</div>
+
+<button class="confettiBtn" onclick="confetti()">🎉 Confetti 🎉</button>
+
+<div class="list">
+  <h3>Ott lesznek:</h3>
+  <div id="list"></div>
+</div>
+
+<h3>Összesen: <span id="count">0</span> fő</h3>
+
+<!-- RÉSZLETEK -->
+<div class="section">
+  <h3>📅 RÉSZLETEK</h3>
+  <p>2026. július 8–9. (szerda–csütörtök)</p>
+</div>
+
+<!-- MAP + LINK -->
+<div class="section">
+  <h3>📍 HELYSZÍN</h3>
+
+  <a href="https://www.google.com/maps/search/Casa+Sofia+Băile+Homorod+92B+535801"
+     target="_blank"
+     style="display:inline-block; padding:10px; background:#00ffd5; color:black; border-radius:10px; text-decoration:none;">
+     📍 Open in Google Maps
+  </a>
+
+  <br><br>
+
+  <iframe
+    src="https://www.google.com/maps?q=Casa%20Sofia%20Băile%20Homorod%2092B%20535801&output=embed"
+    width="100%" height="200" style="border:0; border-radius:12px;">
+  </iframe>
+</div>
+
+<!-- COUNTDOWN -->
+<div class="section">
+  <h3>⏳ VISSZASZÁMLÁLÁS</h3>
+  <div id="countdown"></div>
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
   apiKey: "AIzaSyCYb6Lvht3pv0pThXjg8oiUXrL7HX03tcM",
   authDomain: "abszolvalo-after.firebaseapp.com",
   projectId: "abszolvalo-after",
@@ -59,41 +182,70 @@
   messagingSenderId: "947590019241",
   appId: "1:947590019241:web:f55c24e514ab5d2e8791b8"
 };
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
+const check = document.getElementById("check");
+const form = document.getElementById("form");
+const music = document.getElementById("music");
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+check.addEventListener("change", () => {
+  form.style.display = check.checked ? "block" : "none";
+  music.play().catch(()=>{});
+});
 
-    const check = document.getElementById("check");
-    const form = document.getElementById("form");
+window.send = async function() {
+  const name = document.getElementById("name").value;
+  if (!name) return;
 
-    check.addEventListener("change", () => {
-      form.style.display = check.checked ? "block" : "none";
-    });
+  await addDoc(collection(db, "people"), { name });
+  document.getElementById("name").value = "";
+};
 
-    window.send = async function() {
-      const name = document.getElementById("name").value;
+window.confetti = function() {
+  confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+};
 
-      if (!name) return alert("Írj be nevet!");
+const listDiv = document.getElementById("list");
+const count = document.getElementById("count");
 
-      await addDoc(collection(db, "people"), {
-        name: name
-      });
+onSnapshot(collection(db, "people"), (snapshot) => {
+  listDiv.innerHTML = "";
+  let i = 0;
 
-      document.getElementById("name").value = "";
-    }
+  snapshot.forEach(doc => {
+    i++;
+    const data = doc.data();
+    const color = i % 2 === 0 ? "red" : "white";
 
-    const listDiv = document.getElementById("list");
+    listDiv.innerHTML += `<div class="item ${color}">${i}. ${data.name}</div>`;
+  });
 
-    onSnapshot(collection(db, "people"), (snapshot) => {
-      listDiv.innerHTML = "";
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        listDiv.innerHTML += `<div class="item">• ${data.name}</div>`;
-      });
-    });
+  count.innerText = i;
+});
 
-  </script>
+// countdown
+const countdownEl = document.getElementById("countdown");
+const eventDate = new Date("2026-07-08T18:00:00").getTime();
+
+setInterval(() => {
+  const now = new Date().getTime();
+  const diff = eventDate - now;
+
+  if (diff <= 0) {
+    countdownEl.innerHTML = "🔥 ELKEZDŐDÖTT!";
+    return;
+  }
+
+  const d = Math.floor(diff / (1000*60*60*24));
+  const h = Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+  const m = Math.floor((diff%(1000*60*60))/(1000*60));
+  const s = Math.floor((diff%(1000*60))/1000);
+
+  countdownEl.innerHTML = `${d} nap ${h} óra ${m} perc ${s} mp`;
+}, 1000);
+
+</script>
 
 </body>
 </html>
