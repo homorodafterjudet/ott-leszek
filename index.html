@@ -4,60 +4,126 @@
 <meta charset="UTF-8">
 <title>ABSZOLVALO AFTER</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
 body {
   margin: 0;
-  font-family: Arial;
-  background: linear-gradient(135deg,#00c6ff,#0072ff,#00ffd5);
+  font-family: 'Orbitron', sans-serif;
   color: white;
+  overflow-x: hidden;
+
+  /* többszínű háttér */
+  background: linear-gradient(135deg, #00c6ff, #0072ff, #00ffd5);
+  background-size: 400% 400%;
+  animation: bgMove 10s ease infinite;
+}
+
+@keyframes bgMove {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
+}
+
+/* lebegő emojik */
+.emoji {
+  position: absolute;
+  font-size: 24px;
+  animation: float 8s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes float {
+  from { transform: translateY(100vh); }
+  to { transform: translateY(-10vh); }
 }
 
 .container {
-  max-width: 600px;
+  max-width: 500px;
   margin: auto;
-  padding: 20px;
   text-align: center;
+  padding-top: 40px;
+}
+
+h1 {
+  font-size: 34px;
+  letter-spacing: 2px;
+}
+
+h2 {
+  color: red;
 }
 
 input, button {
-  width: 100%;
-  padding: 12px;
+  padding: 10px;
+  width: 90%;
   margin-top: 10px;
+  border: none;
+  border-radius: 8px;
 }
 
 button {
   background: black;
   color: white;
-  border: none;
+  cursor: pointer;
 }
 
-.red { color: red; }
-.white { color: white; }
+.list {
+  margin-top: 30px;
+  text-align: left;
+}
+
+.item {
+  padding: 5px;
+  font-size: 18px;
+}
+
+.red {
+  color: red;
+}
+
+.white {
+  color: white;
+}
+
+footer {
+  margin-top: 20px;
+  font-size: 18px;
+}
 </style>
 </head>
 
 <body>
 
+<!-- EMOJIK -->
+<div class="emoji" style="left:10%;">🎉</div>
+<div class="emoji" style="left:30%; animation-delay:2s;">🔥</div>
+<div class="emoji" style="left:50%; animation-delay:4s;">🍾</div>
+<div class="emoji" style="left:70%; animation-delay:1s;">🎶</div>
+<div class="emoji" style="left:90%; animation-delay:3s;">💃</div>
+
 <div class="container">
 
 <h1>ABSZOLVALO AFTER</h1>
+
 <h2>OTT LESZEK</h2>
 
-<label>
-<input type="checkbox" id="check"> Jövök
-</label>
+<input type="checkbox" id="check"> Pipáld be ha jössz
 
 <div id="form" style="display:none;">
-  <input type="text" id="name" placeholder="Név">
+  <input type="text" id="name" placeholder="Írd be a neved">
   <button onclick="send()">Küldés</button>
 </div>
 
-<h3>Résztvevők:</h3>
-<div id="list"></div>
+<div class="list">
+  <h3>Ott lesznek:</h3>
+  <div id="list"></div>
+</div>
 
-<h3>Összesen: <span id="count">0</span></h3>
+<footer>
+Összesen: <span id="count">0</span> fő
+</footer>
 
 </div>
 
@@ -92,25 +158,35 @@ check.addEventListener("change", () => {
 
 window.send = async function() {
   const name = document.getElementById("name").value;
-  if (!name) return;
 
-  await addDoc(collection(db, "people"), { name });
+  if (!name) return alert("Írj be nevet!");
+
+  await addDoc(collection(db, "people"), {
+    name: name
+  });
+
   document.getElementById("name").value = "";
 };
 
-const list = document.getElementById("list");
+const listDiv = document.getElementById("list");
 const count = document.getElementById("count");
 
-onSnapshot(collection(db, "people"), (snap) => {
+onSnapshot(collection(db, "people"), (snapshot) => {
 
-  list.innerHTML = "";
+  listDiv.innerHTML = "";
   let i = 0;
 
-  snap.forEach(doc => {
-    i++;
+  snapshot.forEach(doc => {
     const data = doc.data();
+    i++;
 
-    list.innerHTML += `<div class="${i%2===0?'red':'white'}">${i}. ${data.name}</div>`;
+    let colorClass = i % 2 === 0 ? "red" : "white";
+
+    listDiv.innerHTML += `
+      <div class="item ${colorClass}">
+        ${i}. ${data.name}
+      </div>
+    `;
   });
 
   count.innerText = i;
